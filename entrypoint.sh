@@ -1,32 +1,28 @@
 #!/bin/sh -l
 
-# install Rust and musl
-apt-get update >/dev/null; \
-apt-get install -y gcc make curl >/dev/null; \
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y; \
-. $HOME/.cargo/env; \
-curl -L http://musl.libc.org/releases/musl-1.2.3.tar.gz -o musl-1.2.3.tar.gz; \
-tar -zxvf musl-1.2.3.tar.gz >/dev/null; \
-cd musl-1.2.3; \
-./configure >/dev/null; \
-make -j 2 >/dev/null; \
-make install >/dev/null; \
-ln -fs /usr/local/musl/bin/musl-gcc /usr/local/bin/musl-gcc; \
-rustup target add x86_64-unknown-linux-musl;
+prepare() {
+    # Install Rust
+    curl https://sh.rustup.rs -sSf | sh -s -- -y
+    export PATH="$HOME/.cargo/bin:$PATH"
+    # Install musl target
+    rustup target add x86_64-unknown-linux-musl
+    # Install musl-gcc
+    sudo apt-get update
+    sudo apt-get install musl-tools
+    # Install cargo-make
+    cargo install --force cargo-make
+}
 
-
+prepare
 
 # Use INPUT_<INPUT_NAME> to get the value of an input
 echo "cd /github/workspace/$INPUT_PATH"
 cd /github/workspace/$INPUT_PATH
 cargo install --path . --target x86_64-unknown-linux-musl
-pwd
-ls -lh
 # Write outputs to the $GITHUB_OUTPUT file
 if [ "" = "$INPUT_PATH" ]; then
     echo "release_dir=./target/x86_64-unknown-linux-musl/release/" >> "$GITHUB_OUTPUT"
-    exit 0
 else
     echo "release_dir=$INPUT_PATH/target/x86_64-unknown-linux-musl/release/" >> "$GITHUB_OUTPUT"
-    exit 0
 fi
+exit 0
