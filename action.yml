@@ -12,11 +12,10 @@ inputs:
 # Define your outputs here.
 outputs:
   release_dir:
-    description: 'the dir which contain the release binary'
+    description: 'the dir which contain the musl release binary, NOTE: the value ends with /'
 
 runs:
   using: docker
   image: Dockerfile
   env:
     CARGO_TERM_COLOR: always
-    # INPUT_WHO_TO_GREET: ${{ inputs.who-to-greet }}
