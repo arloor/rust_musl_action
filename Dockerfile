@@ -2,10 +2,10 @@
 FROM ubuntu:latest
 # Copy any source file(s) required for the action
 COPY entrypoint.sh /
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y; \
+RUN apt install -y gcc make curl; \
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y; \
     . $HOME/.cargo/env; \
-    wget http://musl.libc.org/releases/musl-1.2.3.tar.gz -O musl-1.2.3.tar.gz; \
-    apt install -y gcc make; \
+    curl -L http://musl.libc.org/releases/musl-1.2.3.tar.gz -o musl-1.2.3.tar.gz; \
     tar -zxvf musl-1.2.3.tar.gz; \
     cd musl-1.2.3; \
     ./configure; \
