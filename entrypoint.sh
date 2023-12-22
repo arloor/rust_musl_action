@@ -20,9 +20,9 @@ pwd
 ls -lh
 # Write outputs to the $GITHUB_OUTPUT file
 if [ "" = "$INPUT_PATH" ]; then
-    echo "release_dir=/github/workspace/target/x86_64-unknown-linux-musl/release/" >> "$GITHUB_OUTPUT"
+    echo "release_dir=./target/x86_64-unknown-linux-musl/release/" >> "$GITHUB_OUTPUT"
     exit 0
 else
-    echo "release_dir=/github/workspace/$INPUT_PATH/target/x86_64-unknown-linux-musl/release/" >> "$GITHUB_OUTPUT"
+    echo "release_dir=$INPUT_PATH/target/x86_64-unknown-linux-musl/release/" >> "$GITHUB_OUTPUT"
     exit 0
 fi

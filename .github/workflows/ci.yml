@@ -34,5 +34,4 @@ jobs:
         id: output
         run: |
           echo "release_dir: ${{ steps.test-action.outputs.release_dir }}"
-          pwd
-          ls -lh 
+          ls -lh ${{ steps.test-action.outputs.release_dir }}
