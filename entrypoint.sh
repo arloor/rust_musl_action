@@ -1,4 +1,6 @@
 #!/bin/sh -l
+
+# install Rust and musl
 apt-get update >/dev/null; \
 apt-get install -y gcc make curl >/dev/null; \
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y; \
@@ -11,10 +13,12 @@ make -j 2 >/dev/null; \
 make install >/dev/null; \
 ln -fs /usr/local/musl/bin/musl-gcc /usr/local/bin/musl-gcc; \
 rustup target add x86_64-unknown-linux-musl;
+
+
+
 # Use INPUT_<INPUT_NAME> to get the value of an input
 echo "cd /github/workspace/$INPUT_PATH"
 cd /github/workspace/$INPUT_PATH
-. "$HOME/.cargo/env"
 cargo install --path . --target x86_64-unknown-linux-musl
 pwd
 ls -lh
