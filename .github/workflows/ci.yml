@@ -18,7 +18,7 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
-      - name: Checkout tools repo
+      - name: Checkout rust_http_proxy
         uses: actions/checkout@v4
         with:
           repository: arloor/rust_http_proxy
