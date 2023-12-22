@@ -1,16 +1,13 @@
 #!/bin/sh -l
 
 prepare() {
+    apt-get update
+    apt-get install musl-tools curl -y
     # Install Rust
-    curl https://sh.rustup.rs -sSf | sh -s -- -y
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y;
     export PATH="$HOME/.cargo/bin:$PATH"
     # Install musl target
     rustup target add x86_64-unknown-linux-musl
-    # Install musl-gcc
-    sudo apt-get update
-    sudo apt-get install musl-tools
-    # Install cargo-make
-    cargo install --force cargo-make
 }
 
 prepare
