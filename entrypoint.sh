@@ -3,7 +3,7 @@
 # Use INPUT_<INPUT_NAME> to get the value of an input
 echo "cd /github/workspace/$INPUT_PATH"
 cd /github/workspace/$INPUT_PATH
-source "$HOME/.cargo/env"
+. "$HOME/.cargo/env"
 cargo install --path . --target x86_64-unknown-linux-musl
 
 # Write outputs to the $GITHUB_OUTPUT file
