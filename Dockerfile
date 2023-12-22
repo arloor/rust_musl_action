@@ -2,7 +2,8 @@
 FROM ubuntu:latest
 # Copy any source file(s) required for the action
 COPY entrypoint.sh /
-RUN apt install -y gcc make curl; \
+RUN apt-get update; \
+    apt-get install -y gcc make curl; \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y; \
     . $HOME/.cargo/env; \
     curl -L http://musl.libc.org/releases/musl-1.2.3.tar.gz -o musl-1.2.3.tar.gz; \
