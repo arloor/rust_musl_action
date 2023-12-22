@@ -1,13 +1,13 @@
 #!/bin/sh -l
-    apt-get update >dev/null; \
+    apt-get update >/dev/null; \
     apt-get install -y gcc make curl; \
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y; \
     . $HOME/.cargo/env; \
     curl -L http://musl.libc.org/releases/musl-1.2.3.tar.gz -o musl-1.2.3.tar.gz; \
-    tar -zxvf musl-1.2.3.tar.gz >dev/null; \
+    tar -zxvf musl-1.2.3.tar.gz >/dev/null; \
     cd musl-1.2.3; \
-    ./configure >dev/null; \
-    make -j 2 >dev/null; \
+    ./configure >/dev/null; \
+    make -j 2 >/dev/null; \
     make install; \
     ln -fs /usr/local/musl/bin/musl-gcc /usr/local/bin/musl-gcc; \
     rustup target add x86_64-unknown-linux-musl; 
