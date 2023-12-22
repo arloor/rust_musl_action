@@ -1,21 +1,22 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Rust musl build'
+description: 'Build rust project with musl target'
+author: 'arloor'
 
 # Define your inputs here.
 inputs:
-  who-to-greet:
-    description: 'Your input description here'
+  path:
+    description: 'Relative path under $GITHUB_WORKSPACE to place the repository'
     required: true
-    default: 'World'
+    default: ''
 
 # Define your outputs here.
 outputs:
-  greeting:
-    description: 'Your output description here'
+  release_dir:
+    description: 'the dir which contain the release binary'
 
 runs:
   using: docker
   image: Dockerfile
   env:
-    INPUT_WHO_TO_GREET: ${{ inputs.who-to-greet }}
+    CARGO_TERM_COLOR: always
+    # INPUT_WHO_TO_GREET: ${{ inputs.who-to-greet }}
