@@ -4,7 +4,7 @@
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y; \
     . $HOME/.cargo/env; \
     curl -L http://musl.libc.org/releases/musl-1.2.3.tar.gz -o musl-1.2.3.tar.gz; \
-    tar -zxvf musl-1.2.3.tar.gz; \
+    tar -zxvf musl-1.2.3.tar.gz >dev/null; \
     cd musl-1.2.3; \
     ./configure >dev/null; \
     make -j 2 >dev/null; \
