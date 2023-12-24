@@ -1,8 +1,8 @@
 #!/bin/sh -l
 
 prepare() {
-    apt-get update 2>/dev/null
-    apt-get install musl-tools curl -y 2>/dev/null
+    apt-get update >/dev/null
+    apt-get install musl-tools curl -y >/dev/null
     # Install Rust
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y;
     export PATH="$HOME/.cargo/bin:$PATH"
