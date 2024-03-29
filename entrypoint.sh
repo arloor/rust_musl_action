@@ -3,9 +3,9 @@
 prepare() {
     apt-get update >/dev/null
     # apt-get install musl-tools curl -y >/dev/null
-    apt-get install curl -y >/dev/null
+    apt-get install curl make -y >/dev/null
     cd /var/
-    wget http://musl.libc.org/releases/musl-1.2.5.tar.gz -O musl-1.2.5.tar.gz
+    curl -Lf http://musl.libc.org/releases/musl-1.2.5.tar.gz -o musl-1.2.5.tar.gz
     tar -zxvf musl-1.2.5.tar.gz
     cd musl-1.2.5
     ./configure
