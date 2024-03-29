@@ -11,7 +11,7 @@ prepare() {
     ./configure
     make -j 2
     make install
-    ln -fs /usr/local/musl/bin/musl-gcc /usr/local/bin/musl-gcc
+    ln -fs /usr/local/musl/bin/musl-gcc /usr/bin/musl-gcc
     # Install Rust
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y;
     export PATH="$HOME/.cargo/bin:$PATH"
