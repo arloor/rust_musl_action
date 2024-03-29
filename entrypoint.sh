@@ -6,7 +6,7 @@ prepare() {
     apt-get install curl make gcc -y >/dev/null
     cd /var/
     curl -Lf http://musl.libc.org/releases/musl-1.2.5.tar.gz -o musl-1.2.5.tar.gz
-    tar -zxvf musl-1.2.5.tar.gz
+    tar -zxf musl-1.2.5.tar.gz
     cd musl-1.2.5
     ./configure
     make -j 2
