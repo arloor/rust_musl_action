@@ -11,7 +11,7 @@ prepare() {
     cd musl-${version}
     ./configure > /dev/null
     make -j 2 > /dev/null
-    make install
+    make install > /dev/null
     ln -fs /usr/local/musl/bin/musl-gcc /usr/bin/musl-gcc
     musl-gcc --version
     # Install Rust
