@@ -9,9 +9,10 @@ prepare() {
     tar -zxvf musl-1.2.5.tar.gz
     cd musl-1.2.5
     ./configure
-    make -j 2
-    make install
-    ln -fs /usr/local/musl/bin/musl-gcc /usr/bin/musl-gcc
+    sudo make -j 2
+    sudo make install
+    sudo ln -fs /usr/local/musl/bin/musl-gcc /usr/bin/musl-gcc
+    musl-gcc --version
     # Install Rust
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y;
     export PATH="$HOME/.cargo/bin:$PATH"
