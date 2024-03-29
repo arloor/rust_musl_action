@@ -1,9 +1,11 @@
 #!/bin/sh -l
 
-prepare() {
+apt(){
     apt-get update >/dev/null
-    # apt-get install musl-tools curl -y >/dev/null
     apt-get install curl make gcc -y >/dev/null
+}
+
+musl(){
     cd /var/
     version=1.2.5
     curl -SsLf http://musl.libc.org/releases/musl-${version}.tar.gz -o musl-${version}.tar.gz
@@ -14,6 +16,9 @@ prepare() {
     make install > /dev/null
     ln -fs /usr/local/musl/bin/musl-gcc /usr/bin/musl-gcc
     musl-gcc --version
+}
+
+rust() {
     # Install Rust
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y;
     export PATH="$HOME/.cargo/bin:$PATH"
@@ -21,7 +26,9 @@ prepare() {
     rustup target add x86_64-unknown-linux-musl
 }
 
-prepare
+apt
+musl
+rust
 
 # Use INPUT_<INPUT_NAME> to get the value of an input
 echo "cd /github/workspace/$INPUT_PATH"
