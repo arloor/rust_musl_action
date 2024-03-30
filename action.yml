@@ -20,6 +20,10 @@ inputs:
     description: 'musl version. eg: 1.2.5'
     required: true
     default: '1.2.5'
+  extra_deps:
+    description: 'extra dependencies to install, separated by space. eg: "libssl-dev libpq-dev"'
+    required: true
+    default: ''
 
 # Define your outputs here.
 outputs:

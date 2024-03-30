@@ -30,7 +30,9 @@ jobs:
         with:
           path: rust_http_proxy
           rust_version: 1.76.0
-          # args: --features jemalloc
+          musl_version: 1.2.5
+          extra_deps: cmake
+          args: --features jemalloc
 
       - name: Print Output
         id: output

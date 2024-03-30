@@ -2,7 +2,7 @@
 
 apt(){
     apt-get update >/dev/null
-    apt-get install curl make cmake gcc -y >/dev/null
+    apt-get install curl make gcc "$@" -y >/dev/null
 }
 
 musl(){
@@ -31,13 +31,13 @@ rust() {
     rustc --version
 }
 
-apt
-musl
-rust
-
 build(){
     cargo build --release --target x86_64-unknown-linux-musl "$@"
 }
+
+apt $INPUT_EXTRA_DEPS
+musl
+rust
 
 # Use INPUT_<INPUT_NAME> to get the value of an input
 echo "cd /github/workspace/$INPUT_PATH"
