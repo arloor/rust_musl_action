@@ -31,7 +31,7 @@ musl
 rust
 
 build(){
-    cargo install --path . --target x86_64-unknown-linux-musl "$@"
+    cargo build --release --target x86_64-unknown-linux-musl "$@"
 }
 
 # Use INPUT_<INPUT_NAME> to get the value of an input
