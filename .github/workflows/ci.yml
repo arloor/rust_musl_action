@@ -29,6 +29,7 @@ jobs:
         uses: ./
         with:
           path: rust_http_proxy
+          use_musl: false
           rust_version: 1.76.0
           musl_version: 1.2.5
           extra_deps: cmake

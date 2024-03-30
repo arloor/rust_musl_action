@@ -4,6 +4,7 @@ echo "Github Action: build musl static binary"
 echo ========================================
 echo "extra_deps: $INPUT_EXTRA_DEPS"
 echo "rust_version: $INPUT_RUST_VERSION"
+echo "use_musl: $INPUT_USE_MUSL"
 echo "musl_version: $INPUT_MUSL_VERSION"
 echo "path: $INPUT_PATH"
 echo "args: $INPUT_ARGS"
@@ -25,6 +26,8 @@ musl(){
     make install > /dev/null
     ln -fs /usr/local/musl/bin/musl-gcc /usr/bin/musl-gcc
     musl-gcc --version
+    # Install musl target
+    rustup target add x86_64-unknown-linux-musl
 }
 
 rust() {
@@ -35,21 +38,27 @@ rust() {
         rustup install $INPUT_RUST_VERSION
         rustup default $INPUT_RUST_VERSION
     fi
-    # Install musl target
-    rustup target add x86_64-unknown-linux-musl
     rustc --version
 }
 
 build(){
-    cargo build --release --target x86_64-unknown-linux-musl "$@"
+    if [ "true" = "$INPUT_USE_MUSL" ]; then
+        cargo build --release --target x86_64-unknown-linux-musl "$@"
+    else
+        cargo build --release "$@"
+    fi
     if [ $? -ne 0 ]; then
         exit 1
     fi
 }
 
 apt $INPUT_EXTRA_DEPS
-musl
 rust
+if [ "true" = "$INPUT_USE_MUSL" ]; then
+    echo "Using musl"
+    musl_path_part="/x86_64-unknown-linux-musl"
+    musl
+fi
 
 # Use INPUT_<INPUT_NAME> to get the value of an input
 echo "cd /github/workspace/$INPUT_PATH"
@@ -57,8 +66,8 @@ cd /github/workspace/$INPUT_PATH
 build $INPUT_ARGS
 # Write outputs to the $GITHUB_OUTPUT file
 if [ "" = "$INPUT_PATH" ]; then
-    echo "release_dir=./target/x86_64-unknown-linux-musl/release/" >> "$GITHUB_OUTPUT"
+    echo "release_dir=./target${musl_path_part}/release/" >> "$GITHUB_OUTPUT"
 else
-    echo "release_dir=$INPUT_PATH/target/x86_64-unknown-linux-musl/release/" >> "$GITHUB_OUTPUT"
+    echo "release_dir=$INPUT_PATH/target${musl_path_part}/release/" >> "$GITHUB_OUTPUT"
 fi
 exit 0

@@ -16,6 +16,10 @@ inputs:
     description: 'rust version. eg: 1.76.0. default is latest'
     required: true
     default: ''
+  use_musl:
+    description: 'use musl or not. eg: true'
+    required: true
+    default: 'true'
   musl_version:
     description: 'musl version. eg: 1.2.5'
     required: true
