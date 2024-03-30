@@ -2,7 +2,7 @@
 
 apt(){
     apt-get update >/dev/null
-    apt-get install curl make gcc -y >/dev/null
+    apt-get install curl make cmake gcc -y >/dev/null
 }
 
 musl(){
