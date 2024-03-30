@@ -8,6 +8,10 @@ inputs:
     description: 'Relative path under $GITHUB_WORKSPACE to place the repository'
     required: true
     default: ''
+  args:
+    description: 'custom args passed to cargo build'
+    required: true
+    default: ''
 
 # Define your outputs here.
 outputs:

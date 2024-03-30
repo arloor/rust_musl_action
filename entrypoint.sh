@@ -30,10 +30,14 @@ apt
 musl
 rust
 
+build(){
+    cargo install --path . --target x86_64-unknown-linux-musl "$@"
+}
+
 # Use INPUT_<INPUT_NAME> to get the value of an input
 echo "cd /github/workspace/$INPUT_PATH"
 cd /github/workspace/$INPUT_PATH
-cargo install --path . --target x86_64-unknown-linux-musl
+build $INPUT_ARGS
 # Write outputs to the $GITHUB_OUTPUT file
 if [ "" = "$INPUT_PATH" ]; then
     echo "release_dir=./target/x86_64-unknown-linux-musl/release/" >> "$GITHUB_OUTPUT"
