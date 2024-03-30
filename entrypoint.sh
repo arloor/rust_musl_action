@@ -42,6 +42,10 @@ rust() {
 
 build(){
     cargo build --release --target x86_64-unknown-linux-musl "$@"
+    if [ $? -ne 0 ]; then
+        echo "Build failed"
+        exit 1
+    fi
 }
 
 apt $INPUT_EXTRA_DEPS
