@@ -1,5 +1,11 @@
 #!/bin/sh -l
 
+echo "extra_deps: $INPUT_EXTRA_DEPS"
+echo "rust_version: $INPUT_RUST_VERSION"
+echo "musl_version: $INPUT_MUSL_VERSION"
+echo "path: $INPUT_PATH"
+echo "args: $INPUT_ARGS"
+
 apt(){
     apt-get update >/dev/null
     apt-get install curl make gcc "$@" -y >/dev/null
