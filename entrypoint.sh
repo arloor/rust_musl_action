@@ -7,7 +7,7 @@ apt(){
 
 musl(){
     cd /var/
-    version=1.2.5
+    version=$INPUT_MUSL_VERSION
     curl -SsLf http://musl.libc.org/releases/musl-${version}.tar.gz -o musl-${version}.tar.gz
     tar -zxf musl-${version}.tar.gz
     cd musl-${version}
