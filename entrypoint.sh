@@ -1,5 +1,6 @@
 #!/bin/sh -l
 
+echo "Github Action: build musl static binary"
 echo "extra_deps: $INPUT_EXTRA_DEPS"
 echo "rust_version: $INPUT_RUST_VERSION"
 echo "musl_version: $INPUT_MUSL_VERSION"
