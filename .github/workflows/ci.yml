@@ -29,6 +29,7 @@ jobs:
         uses: ./
         with:
           path: rust_http_proxy
+          rust_version: 1.76.0
           # args: --features jemalloc
 
       - name: Print Output

@@ -12,6 +12,10 @@ inputs:
     description: 'custom args passed to cargo build'
     required: true
     default: ''
+  rust_version:
+    description: 'rust version. eg: 1.76.0. default is latest'
+    required: true
+    default: ''
   musl_version:
     description: 'musl version. eg: 1.2.5'
     required: true

@@ -24,6 +24,11 @@ rust() {
     export PATH="$HOME/.cargo/bin:$PATH"
     # Install musl target
     rustup target add x86_64-unknown-linux-musl
+    if [ "" != "$INPUT_RUST_VERSION" ]; then 
+        rustup install $INPUT_RUST_VERSION
+        rustup default $INPUT_RUST_VERSION
+    fi
+    rustc --version
 }
 
 apt
