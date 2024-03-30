@@ -1,11 +1,13 @@
 #!/bin/sh -l
 
 echo "Github Action: build musl static binary"
+echo ========================================
 echo "extra_deps: $INPUT_EXTRA_DEPS"
 echo "rust_version: $INPUT_RUST_VERSION"
 echo "musl_version: $INPUT_MUSL_VERSION"
 echo "path: $INPUT_PATH"
 echo "args: $INPUT_ARGS"
+echo ========================================
 
 apt(){
     apt-get update >/dev/null
