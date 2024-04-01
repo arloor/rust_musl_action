@@ -10,9 +10,10 @@ echo "path: $INPUT_PATH"
 echo "args: $INPUT_ARGS"
 echo ========================================
 
-apt(){
-    apt-get update >/dev/null
-    apt-get install curl make gcc "$@" -y >/dev/null
+install_deps(){
+    # apt-get update >/dev/null
+    # apt-get install curl make gcc "$@" -y >/dev/null
+    yum install curl make gcc "$@" -y >/dev/null
 }
 
 musl(){
@@ -52,7 +53,7 @@ build(){
     fi
 }
 
-apt $INPUT_EXTRA_DEPS
+install_deps $INPUT_EXTRA_DEPS
 rust
 if [ "true" = "$INPUT_USE_MUSL" ]; then
     echo "Using musl"
