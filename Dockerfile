@@ -3,5 +3,4 @@ FROM ubuntu:latest
 # Copy any source file(s) required for the action
 COPY entrypoint.sh /
 # Configure the container to be run as an executable
-ENTRYPOINT ["bash"]
-CMD ["/entrypoint.sh"]
+ENTRYPOINT ["bash","/entrypoint.sh"]
