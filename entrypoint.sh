@@ -13,11 +13,19 @@ echo "apt_mirror: $INPUT_APT_MIRROR"
 echo ========================================
 
 apt(){
-    if [ "" != "$INPUT_APT_MIRROR" ]; then
+    if [ -n "$INPUT_APT_MIRROR" ]; then  # 更简洁的非空检查
         echo "Using mirror: $INPUT_APT_MIRROR"
-        sudo sed -i "s/archive.ubuntu.com/$INPUT_APT_MIRROR/g" /etc/apt/sources.list /etc/apt/sources.list.d/*.list
-        cat /etc/apt/sources.list
+        if sudo sed -i "s/archive.ubuntu.com/$INPUT_APT_MIRROR/g" /etc/apt/sources.list /etc/apt/sources.list.d/*.list; then
+            echo "Sources list updated successfully."
+            cat /etc/apt/sources.list  # 可选，根据需要查看或省略
+        else
+            echo "Failed to update sources list."
+            # exit 1  # 添加错误退出状态
+        fi
+    else
+        echo "No mirror specified. Skipping updates."
     fi
+
 
     if [ "true" = "$INPUT_DEBUG" ]; then
         apt-get update
