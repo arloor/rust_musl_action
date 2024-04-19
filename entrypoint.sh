@@ -9,9 +9,16 @@ echo "musl_version: $INPUT_MUSL_VERSION"
 echo "path: $INPUT_PATH"
 echo "args: $INPUT_ARGS"
 echo "debug: $INPUT_DEBUG"
+echo "apt_mirror: $INPUT_APT_MIRROR"
 echo ========================================
 
 apt(){
+    if [ "" != "$INPUT_APT_MIRROR" ]; then
+        echo "Using mirror: $INPUT_APT_MIRROR"
+        sudo sed -i "s/archive.ubuntu.com/$INPUT_APT_MIRROR/g" /etc/apt/sources.list /etc/apt/sources.list.d/*.list
+        cat /etc/apt/sources.list
+    fi
+
     if [ "true" = "$INPUT_DEBUG" ]; then
         apt-get update
         apt-get install curl make gcc "$@" -y

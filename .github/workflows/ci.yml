@@ -35,6 +35,7 @@ jobs:
           extra_deps: cmake
           args: -p rust_http_proxy --features jemalloc
           debug: true
+          apt_mirror: mirrors.mit.edu
 
       - name: Print Output
         id: output

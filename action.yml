@@ -32,6 +32,10 @@ inputs:
     description: 'debug or not. eg: true'
     required: true
     default: 'false'
+  apt_mirror:
+    description: 'apt mirror. eg: mirrors.mit.edu'
+    required: false
+    default: ''
 
 # Define your outputs here.
 outputs:
