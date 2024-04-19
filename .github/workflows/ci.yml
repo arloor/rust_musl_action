@@ -34,6 +34,7 @@ jobs:
           musl_version: 1.2.5
           extra_deps: cmake
           args: --features jemalloc
+          debug: true
 
       - name: Print Output
         id: output
