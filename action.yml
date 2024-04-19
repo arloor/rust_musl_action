@@ -28,6 +28,10 @@ inputs:
     description: 'extra dependencies to install, separated by space. eg: "libssl-dev libpq-dev"'
     required: true
     default: ''
+  debug:
+    description: 'debug or not. eg: true'
+    required: true
+    default: 'false'
 
 # Define your outputs here.
 outputs:

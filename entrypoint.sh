@@ -8,11 +8,17 @@ echo "use_musl: $INPUT_USE_MUSL"
 echo "musl_version: $INPUT_MUSL_VERSION"
 echo "path: $INPUT_PATH"
 echo "args: $INPUT_ARGS"
+echo "debug: $INPUT_DEBUG"
 echo ========================================
 
 apt(){
-    apt-get update >/dev/null
-    apt-get install curl make gcc "$@" -y >/dev/null
+    if [ "true" = "$INPUT_DEBUG" ]; then
+        apt-get update
+        apt-get install curl make gcc "$@" -y
+    else
+        apt-get update > /dev/null
+        apt-get install curl make gcc "$@" -y > /dev/null
+    fi
 }
 
 musl(){
