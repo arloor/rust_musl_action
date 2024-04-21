@@ -1,7 +1,7 @@
 #!/bin/sh -l
 
 echo "Github Action: build musl static binary"
-echo ========================================
+echo ====================INPUT ARGS START====================
 echo "extra_deps: $INPUT_EXTRA_DEPS"
 echo "rust_version: $INPUT_RUST_VERSION"
 echo "use_musl: $INPUT_USE_MUSL"
@@ -10,7 +10,7 @@ echo "path: $INPUT_PATH"
 echo "args: $INPUT_ARGS"
 echo "debug: $INPUT_DEBUG"
 echo "apt_mirror: $INPUT_APT_MIRROR"
-echo ========================================
+echo ====================INPUT ARGS END======================
 
 apt(){
     if [ -n "$INPUT_APT_MIRROR" ]; then  # 更简洁的非空检查
@@ -18,19 +18,18 @@ apt(){
         if sed -i "s/archive.ubuntu.com/$INPUT_APT_MIRROR/g" /etc/apt/sources.list; then
             echo "Sources list updated successfully."
             if [ "true" = "$INPUT_DEBUG" ]; then
-                echo =============start sources.list========================= 
+                echo =============current sources.list START================
                 cat /etc/apt/sources.list  # 可选，根据需要查看或省略
-                echo =============end sources.list========================= 
+                echo =============current sources.list END================
             fi
         else
             echo "Failed to update sources list."
-            # exit 1  # 添加错误退出状态
+            exit 1  # 添加错误退出状态
         fi
-    else
-        echo "No mirror specified. Skipping updates."
     fi
 
-
+    echo =============INSTALL DEPENDENCIES START $(date %T)================
+    echo install curl make gcc "$@" 
     if [ "true" = "$INPUT_DEBUG" ]; then
         apt-get update
         apt-get install curl make gcc "$@" -y
@@ -38,9 +37,11 @@ apt(){
         apt-get update > /dev/null
         apt-get install curl make gcc "$@" -y > /dev/null
     fi
+    echo =============INSTALL DEPENDENCIES END $(date %T)================
 }
 
 musl(){
+    echo =============INSTALL MUSL START $(date %T)================
     cd /var/
     version=$INPUT_MUSL_VERSION
     curl -SsLf http://musl.libc.org/releases/musl-${version}.tar.gz -o musl-${version}.tar.gz
@@ -53,10 +54,11 @@ musl(){
     musl-gcc --version
     # Install musl target
     rustup target add x86_64-unknown-linux-musl
+    echo =============INSTALL MUSL END $(date %T)================
 }
 
 rust() {
-    # Install Rust
+    echo =============INSTALL RUSTUP START $(date %T)================
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y;
     export PATH="$HOME/.cargo/bin:$PATH"
     if [ "" != "$INPUT_RUST_VERSION" ]; then 
@@ -64,6 +66,7 @@ rust() {
         rustup default $INPUT_RUST_VERSION
     fi
     rustc --version
+    echo =============INSTALL RUSTUP END $(date %T)================
 }
 
 build(){
