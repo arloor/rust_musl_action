@@ -28,7 +28,8 @@ apt(){
         fi
     fi
 
-    echo =============INSTALL DEPENDENCIES START $(date %T)================
+    echo =============INSTALL DEPENDENCIES START ================
+    start=$(date +%s)
     echo install curl make gcc "$@" 
     if [ "true" = "$INPUT_DEBUG" ]; then
         apt-get update
@@ -37,11 +38,13 @@ apt(){
         apt-get update > /dev/null
         apt-get install curl make gcc "$@" -y > /dev/null
     fi
-    echo =============INSTALL DEPENDENCIES END $(date %T)================
+    end=$(date +%s)
+    echo =============INSTALL DEPENDENCIES END in $((end - start)) seconds ================
 }
 
 musl(){
-    echo =============INSTALL MUSL START $(date %T)================
+    echo =============INSTALL MUSL START ================
+    start=$(date +%s)
     cd /var/
     version=$INPUT_MUSL_VERSION
     curl -SsLf http://musl.libc.org/releases/musl-${version}.tar.gz -o musl-${version}.tar.gz
@@ -54,11 +57,13 @@ musl(){
     musl-gcc --version
     # Install musl target
     rustup target add x86_64-unknown-linux-musl
-    echo =============INSTALL MUSL END $(date %T)================
+    end=$(date +%s)
+    echo =============INSTALL MUSL END in $((end - start)) seconds ================
 }
 
 rust() {
-    echo =============INSTALL RUSTUP START $(date %T)================
+    echo =============INSTALL RUSTUP START ================
+    start=$(date +%s)
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y;
     export PATH="$HOME/.cargo/bin:$PATH"
     if [ "" != "$INPUT_RUST_VERSION" ]; then 
@@ -66,10 +71,12 @@ rust() {
         rustup default $INPUT_RUST_VERSION
     fi
     rustc --version
-    echo =============INSTALL RUSTUP END $(date %T)================
+    end=$(date +%s)
+    echo =============INSTALL RUSTUP END in $((end - start)) seconds ================
 }
 
 build(){
+    start=$(date +%s)
     if [ "true" = "$INPUT_USE_MUSL" ]; then
         cargo build --release --target x86_64-unknown-linux-musl "$@"
     else
@@ -78,6 +85,8 @@ build(){
     if [ $? -ne 0 ]; then
         exit 1
     fi
+    end=$(date +%s)
+    echo build finished in $((end - start)) seconds
 }
 
 apt $INPUT_EXTRA_DEPS
