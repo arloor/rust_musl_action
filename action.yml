@@ -6,28 +6,24 @@ author: 'arloor'
 inputs:
   path:
     description: 'Relative path under $GITHUB_WORKSPACE to place the repository'
-    required: true
-    default: ''
+    required: false
   args:
     description: 'custom args passed to cargo build'
-    required: true
-    default: ''
+    required: false
   rust_version:
     description: 'rust version. eg: 1.76.0. default is latest'
-    required: true
-    default: ''
+    required: false
   use_musl:
     description: 'use musl or not. eg: true'
     required: true
     default: 'true'
   musl_version:
     description: 'musl version. eg: 1.2.5'
-    required: true
+    required: false
     default: '1.2.5'
   extra_deps:
     description: 'extra dependencies to install, separated by space. eg: "libssl-dev libpq-dev"'
-    required: true
-    default: ''
+    required: false
   debug:
     description: 'debug or not. eg: true'
     required: true
@@ -35,7 +31,6 @@ inputs:
   apt_mirror:
     description: 'apt mirror. eg: mirrors.mit.edu'
     required: false
-    default: ''
 
 # Define your outputs here.
 outputs:
