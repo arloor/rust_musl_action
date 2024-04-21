@@ -17,7 +17,7 @@ apt(){
         echo "Using mirror: $INPUT_APT_MIRROR"
         if sed -i "s/archive.ubuntu.com/$INPUT_APT_MIRROR/g" /etc/apt/sources.list; then
             echo "Sources list updated successfully."
-            if [ "true" = "$INPUT_USE_MUSL" ]; then
+            if [ "true" = "$INPUT_DEBUG" ]; then
                 cat /etc/apt/sources.list  # 可选，根据需要查看或省略
             fi
         else
