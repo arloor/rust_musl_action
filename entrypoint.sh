@@ -15,7 +15,7 @@ echo ========================================
 apt(){
     if [ -n "$INPUT_APT_MIRROR" ]; then  # 更简洁的非空检查
         echo "Using mirror: $INPUT_APT_MIRROR"
-        if sed -i "s/archive.ubuntu.com/$INPUT_APT_MIRROR/g" /etc/apt/sources.list /etc/apt/sources.list.d/*.list; then
+        if sed -i "s/archive.ubuntu.com/$INPUT_APT_MIRROR/g" /etc/apt/sources.list; then
             echo "Sources list updated successfully."
             cat /etc/apt/sources.list  # 可选，根据需要查看或省略
         else
