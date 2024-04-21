@@ -18,7 +18,9 @@ apt(){
         if sed -i "s/archive.ubuntu.com/$INPUT_APT_MIRROR/g" /etc/apt/sources.list; then
             echo "Sources list updated successfully."
             if [ "true" = "$INPUT_DEBUG" ]; then
+                echo =============start sources.list========================= 
                 cat /etc/apt/sources.list  # 可选，根据需要查看或省略
+                echo =============end sources.list========================= 
             fi
         else
             echo "Failed to update sources list."
