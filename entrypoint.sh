@@ -1,7 +1,6 @@
 #!/bin/sh -l
 
 echo "Github Action: build musl static binary"
-echo ====================INPUT ARGS START====================
 echo "extra_deps: $INPUT_EXTRA_DEPS"
 echo "rust_version: $INPUT_RUST_VERSION"
 echo "use_musl: $INPUT_USE_MUSL"
@@ -10,7 +9,7 @@ echo "path: $INPUT_PATH"
 echo "args: $INPUT_ARGS"
 echo "debug: $INPUT_DEBUG"
 echo "apt_mirror: $INPUT_APT_MIRROR"
-echo ====================INPUT ARGS END======================
+echo =========================================
 
 apt(){
     if [ -n "$INPUT_APT_MIRROR" ]; then  # 更简洁的非空检查
@@ -18,9 +17,9 @@ apt(){
         if sed -i "s/archive.ubuntu.com/$INPUT_APT_MIRROR/g" /etc/apt/sources.list; then
             echo "Sources list updated successfully."
             if [ "true" = "$INPUT_DEBUG" ]; then
-                echo =============current sources.list START================
-                cat /etc/apt/sources.list  # 可选，根据需要查看或省略
-                echo =============current sources.list END================
+                echo "current /etc/apt/sources.list:"
+                cat /etc/apt/sources.list
+                echo =============/etc/apt/sources.list END================
             fi
         else
             echo "Failed to update sources list."
@@ -28,7 +27,7 @@ apt(){
         fi
     fi
 
-    echo =============INSTALL DEPENDENCIES START ================
+
     start=$(date +%s)
     echo install curl make gcc "$@" 
     if [ "true" = "$INPUT_DEBUG" ]; then
@@ -39,11 +38,10 @@ apt(){
         apt-get install curl make gcc "$@" -y > /dev/null
     fi
     end=$(date +%s)
-    echo =============INSTALL DEPENDENCIES END in $((end - start)) seconds ================
+    echo =============install dependencies in $((end - start)) seconds ================
 }
 
 musl(){
-    echo =============INSTALL MUSL START ================
     start=$(date +%s)
     cd /var/
     version=$INPUT_MUSL_VERSION
@@ -58,11 +56,10 @@ musl(){
     # Install musl target
     rustup target add x86_64-unknown-linux-musl
     end=$(date +%s)
-    echo =============INSTALL MUSL END in $((end - start)) seconds ================
+    echo =============compile musl-gcc in $((end - start)) seconds ================
 }
 
 rust() {
-    echo =============INSTALL RUSTUP START ================
     start=$(date +%s)
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y;
     export PATH="$HOME/.cargo/bin:$PATH"
@@ -72,7 +69,7 @@ rust() {
     fi
     rustc --version
     end=$(date +%s)
-    echo =============INSTALL RUSTUP END in $((end - start)) seconds ================
+    echo =============install rust in $((end - start)) seconds ================
 }
 
 build(){
@@ -86,7 +83,7 @@ build(){
         exit 1
     fi
     end=$(date +%s)
-    echo build finished in $((end - start)) seconds
+    echo =============build finished in $((end - start)) seconds ================
 }
 
 apt $INPUT_EXTRA_DEPS
