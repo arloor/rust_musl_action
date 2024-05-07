@@ -78,7 +78,7 @@ build(){
     if [ "true" = "$INPUT_USE_MUSL" ]; then
         cargo build --release --target x86_64-unknown-linux-musl "$@"
     else
-        cargo build --release "$@"
+        cargo build --release --target x86_64-unknown-linux-gnu "$@"
     fi
     if [ $? -ne 0 ]; then
         exit 1
@@ -91,8 +91,10 @@ apt $INPUT_EXTRA_DEPS
 rust
 if [ "true" = "$INPUT_USE_MUSL" ]; then
     echo "Using musl"
-    musl_path_part="/x86_64-unknown-linux-musl"
+    target_part_path="/x86_64-unknown-linux-musl"
     musl
+else
+    target_part_path="/x86_64-unknown-linux-gnu"
 fi
 
 # Use INPUT_<INPUT_NAME> to get the value of an input
@@ -101,8 +103,8 @@ cd /github/workspace/$INPUT_PATH
 build $INPUT_ARGS
 # Write outputs to the $GITHUB_OUTPUT file
 if [ "" = "$INPUT_PATH" ]; then
-    echo "release_dir=./target${musl_path_part}/release/" >> "$GITHUB_OUTPUT"
+    echo "release_dir=./target${target_part_path}/release/" >> "$GITHUB_OUTPUT"
 else
-    echo "release_dir=$INPUT_PATH/target${musl_path_part}/release/" >> "$GITHUB_OUTPUT"
+    echo "release_dir=$INPUT_PATH/target${target_part_path}/release/" >> "$GITHUB_OUTPUT"
 fi
 exit 0
