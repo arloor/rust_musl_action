@@ -36,7 +36,6 @@ jobs:
           args: -p rust_http_proxy --features jemalloc
           debug: true
           apt_mirror: mirrors.mit.edu
-          rust_flags: "-C target-feature=+crt-static"
 
       - name: Print Output
         id: output
