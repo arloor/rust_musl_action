@@ -9,6 +9,7 @@ echo "path: $INPUT_PATH"
 echo "args: $INPUT_ARGS"
 echo "debug: $INPUT_DEBUG"
 echo "apt_mirror: $INPUT_APT_MIRROR"
+echo "rust_flags: ${RUSTFLAGS}"
 echo =========================================
 
 apt(){
