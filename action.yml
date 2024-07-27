@@ -1,5 +1,5 @@
-name: 'Rust musl build'
-description: 'Build rust project with musl target'
+name: 'Rust Build Action'
+description: 'Build rust project with musl/gnu target'
 author: 'arloor'
 
 # Define your inputs here.

@@ -1,4 +1,4 @@
-# Build Rust Musl excutable bin
+# Build Rust Musl/Gnu excutable bin
 
 [usage example](https://github.com/arloor/rust_http_proxy/blob/master/.github/workflows/rust.yml)
 
