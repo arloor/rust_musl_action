@@ -1,50 +1,54 @@
-name: 'Rust Build Action'
-description: 'Build rust project with musl/gnu target'
-author: 'arloor'
+name: "Rust Build Action"
+description: "Build rust project with musl/gnu target"
+author: "arloor"
 
 # Define your inputs here.
 inputs:
   path:
-    description: 'Relative path under $GITHUB_WORKSPACE to place the repository'
+    description: "Relative path under $GITHUB_WORKSPACE to place the repository"
     required: true
-    default: ''
+    default: ""
   args:
-    description: 'custom args passed to cargo build'
+    description: "custom args passed to cargo build"
     required: true
-    default: ''
+    default: ""
   rust_version:
-    description: 'rust version. eg: 1.76.0. default is latest'
+    description: "rust version. eg: 1.76.0. default is latest"
     required: true
-    default: ''
+    default: ""
   use_musl:
-    description: 'use musl or not. eg: true'
+    description: "use musl or not. eg: true"
     required: true
-    default: 'true'
+    default: "true"
   musl_version:
-    description: 'musl version. eg: 1.2.5'
+    description: "musl version. eg: 1.2.5"
     required: true
-    default: '1.2.5'
+    default: "1.2.5"
   extra_deps:
     description: 'extra dependencies to install, separated by space. eg: "libssl-dev libpq-dev"'
     required: true
-    default: ''
-  debug:
-    description: 'debug or not. eg: true'
+    default: ""
+  after_install:
+    description: "shell commands to run after install dependencies"
     required: true
-    default: 'false'
+    default: ""
+  debug:
+    description: "debug or not. eg: true"
+    required: true
+    default: "false"
   apt_mirror:
-    description: 'apt mirror. eg: mirrors.mit.edu'
+    description: "apt mirror. eg: mirrors.mit.edu"
     required: false
-    default: ''
+    default: ""
   rust_flags:
     description: 'RUSTFLAGS. eg: "-C target-feature=+crt-static"'
     required: false
-    default: ''
+    default: ""
 
 # Define your outputs here.
 outputs:
   release_dir:
-    description: 'the dir which contain the musl release binary, NOTE: the value ends with /'
+    description: "the dir which contain the musl release binary, NOTE: the value ends with /"
 
 runs:
   using: docker

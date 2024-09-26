@@ -33,6 +33,9 @@ jobs:
           rust_version: 1.80.0
           musl_version: 1.2.5
           extra_deps: cmake
+          after_install: |
+            uptime
+            echo "after install ended"
           args: -p rust_http_proxy --features jemalloc
           debug: true
           apt_mirror: mirrors.mit.edu

@@ -2,6 +2,7 @@
 
 echo =========================================
 echo "extra_deps: $INPUT_EXTRA_DEPS"
+echo "after_install: $INPUT_AFTER_INSTALL"
 echo "rust_version: $INPUT_RUST_VERSION"
 echo "use_musl: $INPUT_USE_MUSL"
 echo "musl_version: $INPUT_MUSL_VERSION"
@@ -38,6 +39,7 @@ apt(){
         apt-get update > /dev/null
         apt-get install curl make gcc "$@" -y > /dev/null
     fi
+    bash -c "$INPUT_AFTER_INSTALL"
     end=$(date +%s)
     echo =============install dependencies in $((end - start)) seconds ================
 }
