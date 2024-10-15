@@ -18,25 +18,25 @@ jobs:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v4
-      - name: Checkout rust_http_proxy
+      - name: Checkout nftables-nat-rust
         uses: actions/checkout@v4
         with:
-          repository: arloor/rust_http_proxy
-          path: rust_http_proxy
+          repository: arloor/nftables-nat-rust
+          path: nftables-nat-rust
 
       - name: Test Local Action
         id: test-action
         uses: ./
         with:
-          path: rust_http_proxy
+          path: nftables-nat-rust
           use_musl: false
-          rust_version: 1.80.0
+          rust_version: 1.81.0
           musl_version: 1.2.5
           extra_deps: cmake
           after_install: |
             uptime
             echo "after install ended"
-          args: -p rust_http_proxy --features jemalloc
+          args: -p dnat
           debug: true
           apt_mirror: mirrors.mit.edu
 

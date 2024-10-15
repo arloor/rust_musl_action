@@ -64,12 +64,11 @@ musl(){
 
 rust() {
     start=$(date +%s)
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y;
-    export PATH="$HOME/.cargo/bin:$PATH"
     if [ "" != "$INPUT_RUST_VERSION" ]; then 
-        rustup install $INPUT_RUST_VERSION
-        rustup default $INPUT_RUST_VERSION
+        local version_part="--default-toolchain $INPUT_RUST_VERSION"
     fi
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y $version_part;
+    export PATH="$HOME/.cargo/bin:$PATH"
     rustc --version
     end=$(date +%s)
     echo =============install rust in $((end - start)) seconds ================
