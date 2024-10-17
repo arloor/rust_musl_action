@@ -19,7 +19,7 @@ inputs:
   use_musl:
     description: "use musl or not. eg: true"
     required: true
-    default: "true"
+    default: "false"
   musl_version:
     description: "musl version. eg: 1.2.5"
     required: true
