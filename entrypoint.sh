@@ -94,12 +94,12 @@ build(){
     echo =============build finished in $((end - start)) seconds ================
 }
 
-apt $INPUT_EXTRA_DEPS
+apt curl $INPUT_EXTRA_DEPS
 rust
 if [ "true" = "$INPUT_USE_MUSL" ]; then
     echo "Using musl"
     target_part_path="/x86_64-unknown-linux-musl"
-    apt curl make gcc 
+    apt make gcc 
     musl
 else
     target_part_path="/x86_64-unknown-linux-gnu"
