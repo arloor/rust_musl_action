@@ -19,12 +19,12 @@ apt_pre(){
         if sed -i "s/archive.ubuntu.com/$INPUT_APT_MIRROR/g" /etc/apt/sources.list; then
             echo "Sources list updated successfully."
             if [ "true" = "$INPUT_DEBUG" ]; then
-                echo "current /etc/apt/sources.list:"
+                echo -e "\e[32mcurrent /etc/apt/sources.list:\e[0m"
                 cat /etc/apt/sources.list
                 echo -e "\e[32m=============/etc/apt/sources.list END================\e[0m"
             fi
         else
-            echo "Failed to update sources list."
+            echo -e "\e[31mFailed to update sources list.\e[0m"
             exit 1  # 添加错误退出状态
         fi
     fi
@@ -105,7 +105,10 @@ else
     target_part_path="/x86_64-unknown-linux-gnu"
 fi
 
+
+echo -e "\e[32m============= run commands after install BEGIN================\e[0m"
 eval "$INPUT_AFTER_INSTALL"
+echo -e "\e[32m============= run commands after install END================\e[0m"
 
 # Use INPUT_<INPUT_NAME> to get the value of an input
 echo "cd /github/workspace/$INPUT_PATH"
