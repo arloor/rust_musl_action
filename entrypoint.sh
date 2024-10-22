@@ -1,6 +1,6 @@
 #!/bin/sh -l
 
-echo =========================================
+echo -e "\e[32m=========================================\e[0m"
 echo "extra_deps: $INPUT_EXTRA_DEPS"
 echo "after_install: $INPUT_AFTER_INSTALL"
 echo "rust_version: $INPUT_RUST_VERSION"
@@ -11,7 +11,7 @@ echo "args: $INPUT_ARGS"
 echo "debug: $INPUT_DEBUG"
 echo "apt_mirror: $INPUT_APT_MIRROR"
 echo "rust_flags: ${RUSTFLAGS}"
-echo =========================================
+echo -e "\e[32m=========================================\e[0m"
 
 apt_pre(){
     if [ -n "$INPUT_APT_MIRROR" ]; then  # 更简洁的非空检查
@@ -21,7 +21,7 @@ apt_pre(){
             if [ "true" = "$INPUT_DEBUG" ]; then
                 echo "current /etc/apt/sources.list:"
                 cat /etc/apt/sources.list
-                echo =============/etc/apt/sources.list END================
+                echo -e "\e[32m=============/etc/apt/sources.list END================\e[0m"
             fi
         else
             echo "Failed to update sources list."
@@ -46,7 +46,7 @@ apt(){
             apt-get install "$@" -y > /dev/null
         fi
         end=$(date +%s)
-        echo =============install "$@" in $((end - start)) seconds ================
+        echo -e "\e[32m=============install ""$@"" in $((end - start)) seconds ================\e[0m"
     }
 }
 
@@ -65,7 +65,7 @@ musl(){
     # Install musl target
     rustup target add x86_64-unknown-linux-musl
     end=$(date +%s)
-    echo =============compile musl-gcc in $((end - start)) seconds ================
+    echo -e "\e[32m=============compile musl-gcc in $((end - start)) seconds ================\e[0m"
 }
 
 rust() {
@@ -77,7 +77,7 @@ rust() {
     export PATH="$HOME/.cargo/bin:$PATH"
     rustc --version
     end=$(date +%s)
-    echo =============install rust in $((end - start)) seconds ================
+    echo -e "\e[32m=============install rust in $((end - start)) seconds ================\e[0m"
 }
 
 build(){
@@ -91,7 +91,7 @@ build(){
         exit 1
     fi
     end=$(date +%s)
-    echo =============build finished in $((end - start)) seconds ================
+    echo -e "\e[32m=============build finished in $((end - start)) seconds ================\e[0m"
 }
 
 apt curl $INPUT_EXTRA_DEPS
