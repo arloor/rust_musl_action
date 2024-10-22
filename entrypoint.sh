@@ -13,7 +13,7 @@ echo "apt_mirror: $INPUT_APT_MIRROR"
 echo "rust_flags: ${RUSTFLAGS}"
 echo =========================================
 
-apt(){
+apt_pre(){
     if [ -n "$INPUT_APT_MIRROR" ]; then  # 更简洁的非空检查
         echo "Using mirror: $INPUT_APT_MIRROR"
         if sed -i "s/archive.ubuntu.com/$INPUT_APT_MIRROR/g" /etc/apt/sources.list; then
@@ -28,20 +28,26 @@ apt(){
             exit 1  # 添加错误退出状态
         fi
     fi
+}
 
-
-    start=$(date +%s)
-    echo install curl make gcc "$@" 
-    if [ "true" = "$INPUT_DEBUG" ]; then
-        apt-get update
-        apt-get install curl make gcc "$@" -y
-    else
-        apt-get update > /dev/null
-        apt-get install curl make gcc "$@" -y > /dev/null
-    fi
-    eval "$INPUT_AFTER_INSTALL"
-    end=$(date +%s)
-    echo =============install dependencies in $((end - start)) seconds ================
+apt(){
+    [ -n "$1" ]&&{
+        if [ "$apt_pre_done" != "1" ];then
+            apt_pre
+            apt_pre_done=1
+        fi
+        start=$(date +%s)
+        echo install "$@" 
+        if [ "true" = "$INPUT_DEBUG" ]; then
+            apt-get update
+            apt-get install "$@" -y
+        else
+            apt-get update > /dev/null
+            apt-get install "$@" -y > /dev/null
+        fi
+        end=$(date +%s)
+        echo =============install "$@" in $((end - start)) seconds ================
+    }
 }
 
 musl(){
@@ -93,10 +99,13 @@ rust
 if [ "true" = "$INPUT_USE_MUSL" ]; then
     echo "Using musl"
     target_part_path="/x86_64-unknown-linux-musl"
+    apt curl make gcc 
     musl
 else
     target_part_path="/x86_64-unknown-linux-gnu"
 fi
+
+eval "$INPUT_AFTER_INSTALL"
 
 # Use INPUT_<INPUT_NAME> to get the value of an input
 echo "cd /github/workspace/$INPUT_PATH"
