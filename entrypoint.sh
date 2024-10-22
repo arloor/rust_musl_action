@@ -39,7 +39,7 @@ apt(){
         apt-get update > /dev/null
         apt-get install curl make gcc "$@" -y > /dev/null
     fi
-    bash -c "$INPUT_AFTER_INSTALL"
+    eval "$INPUT_AFTER_INSTALL"
     end=$(date +%s)
     echo =============install dependencies in $((end - start)) seconds ================
 }
