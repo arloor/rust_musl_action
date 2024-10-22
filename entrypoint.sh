@@ -105,8 +105,6 @@ else
     target_part_path="/x86_64-unknown-linux-gnu"
 fi
 
-
-echo -e "\e[32m============= run commands after install BEGIN================\e[0m"
 eval "$INPUT_AFTER_INSTALL"
 echo -e "\e[32m============= run commands after install END================\e[0m"
 
