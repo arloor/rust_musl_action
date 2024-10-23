@@ -107,9 +107,10 @@ fi
 
 if [ "" != "$INPUT_AFTER_INSTALL" ]; then
     eval "$INPUT_AFTER_INSTALL"
-    echo -e "\e[32m============= run commands after install END================\e[0m"
+    echo -e "\e[32m============= run commands after install END ================\e[0m"
 fi
 
+echo -e "\e[32mCompiling Rust crate.....\e[0m"
 # Use INPUT_<INPUT_NAME> to get the value of an input
 echo "cd /github/workspace/$INPUT_PATH"
 cd /github/workspace/$INPUT_PATH
