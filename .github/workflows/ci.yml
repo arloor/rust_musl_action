@@ -32,6 +32,7 @@ jobs:
           use_musl: false
           extra_deps: gcc-10 cmake zlib1g-dev libelf-dev clang pkg-config make
           after_install: |
+            gcc -v
             # find / -name libelf.a
             # find / -name libbpf.a
             # find / -name libz.a
