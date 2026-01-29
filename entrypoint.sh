@@ -13,7 +13,7 @@ echo "apt_mirror: $INPUT_APT_MIRROR"
 echo "rust_flags: ${RUSTFLAGS}"
 echo -e "\e[32m=========================================\e[0m"
 
-apt_pre() {
+setup_apt_source() {
     if [ -n "$INPUT_APT_MIRROR" ]; then # 更简洁的非空检查
         echo "Using mirror: $INPUT_APT_MIRROR"
         if sed -i "s/archive.ubuntu.com/$INPUT_APT_MIRROR/g" /etc/apt/sources.list; then
@@ -30,11 +30,11 @@ apt_pre() {
     fi
 }
 
-apt() {
+apt_install() {
     [ -n "$1" ] && {
-        if [ "$apt_pre_done" != "1" ]; then
-            apt_pre
-            apt_pre_done=1
+        if [ "$setup_apt_source_done" != "1" ]; then
+            setup_apt_source
+            setup_apt_source_done=1
         fi
         start=$(date +%s)
         echo install "$@"
@@ -50,7 +50,7 @@ apt() {
     }
 }
 
-musl() {
+install_musl() {
     start=$(date +%s)
     cd /var/
     version=$INPUT_MUSL_VERSION
@@ -68,7 +68,7 @@ musl() {
     echo -e "\e[32m=============compile musl-gcc in $((end - start)) seconds ================\e[0m"
 }
 
-rust() {
+install_rust() {
     start=$(date +%s)
     if [ "" != "$INPUT_RUST_VERSION" ]; then
         local version_part="--default-toolchain $INPUT_RUST_VERSION"
@@ -94,13 +94,13 @@ build() {
     echo -e "\e[32m=============build finished in $((end - start)) seconds ================\e[0m"
 }
 
-apt curl gcc $INPUT_EXTRA_DEPS
-rust
+apt_install curl gcc $INPUT_EXTRA_DEPS
+install_rust
 if [ "true" = "$INPUT_USE_MUSL" ]; then
     echo "Using musl"
     target_part_path="/x86_64-unknown-linux-musl"
-    apt make
-    musl
+    apt_install make
+    install_musl
 else
     target_part_path="/x86_64-unknown-linux-gnu"
 fi
