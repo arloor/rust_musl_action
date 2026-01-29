@@ -1,4 +1,4 @@
-name: Release Latest Tag
+name: Auto Release Latest Tag
 on:
   pull_request:
   push:
@@ -9,8 +9,8 @@ permissions:
   contents: write
 
 jobs:
-  test-action:
-    name: GitHub Actions Test
+  auto-release:
+    name: Auto Release Latest Tag
     runs-on: ubuntu-latest
 
     steps:

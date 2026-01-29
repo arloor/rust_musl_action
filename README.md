@@ -109,7 +109,7 @@ This action uses a Docker container based on Ubuntu Focal (20.04) that:
 
 ## Development and Testing
 
-This action is tested in the [CI workflow](.github/workflows/ci.yml), which:
+This action is tested in the [Auto-release workflow](.github/workflows/auto-release.yml), which:
 - Builds a real Rust project with complex dependencies
 - Tests both musl and GNU targets
 - Publishes the `latest` release tag with built artifacts
