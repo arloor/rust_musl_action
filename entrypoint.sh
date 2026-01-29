@@ -117,8 +117,8 @@ cd /github/workspace/$INPUT_PATH
 build $INPUT_ARGS
 # Write outputs to the $GITHUB_OUTPUT file
 if [ "" = "$INPUT_PATH" ]; then
-    echo "release_dir=./target${target_part_path}/release/" >>"$GITHUB_OUTPUT"
+    echo "release_dir=./target${target_part_path}/release" >>"$GITHUB_OUTPUT"
 else
-    echo "release_dir=$INPUT_PATH/target${target_part_path}/release/" >>"$GITHUB_OUTPUT"
+    echo "release_dir=$INPUT_PATH/target${target_part_path}/release" >>"$GITHUB_OUTPUT"
 fi
 exit 0
