@@ -118,6 +118,7 @@ install_rust
 
 if [ "true" = "$INPUT_USE_ZIGBUILD" ]; then
     echo "Using cargo zigbuild"
+    apt_install xz-utils
     install_zig
 elif [ "true" = "$INPUT_USE_MUSL" ]; then
     echo "Using musl"
