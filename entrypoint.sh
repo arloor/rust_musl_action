@@ -91,6 +91,9 @@ install_zig() {
     curl -SsLf https://ziglang.org/download/${version}/${name}.tar.xz -o- | tar -xJf - -C /tmp
     export PATH="/tmp/${name}:$PATH"
     zig version
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
     echo "Installing cargo-zigbuild..."
     cargo install cargo-zigbuild
     end=$(date +%s)
