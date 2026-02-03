@@ -74,7 +74,7 @@ jobs:
           ls -lh ${{ steps.test.outputs.release_dir }}
 
   test-musl:
-    name: Test Zig Build
+    name: Test musl Build
     runs-on: ubuntu-latest
 
     steps:
