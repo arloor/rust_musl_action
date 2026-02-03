@@ -40,12 +40,24 @@ jobs:
             echo -e "\e[31mLIBBPF_SYS_LIBRARY_PATH=$LIBBPF_SYS_LIBRARY_PATH\e[0m"
           args: -p rust_http_proxy --no-default-features --features aws_lc_rs,bpf_static
           debug: true
-
       - name: Output
         id: output
         run: |
           echo "release_dir: ${{ steps.test-action.outputs.release_dir }}"
           ls -lh ${{ steps.test-action.outputs.release_dir }}
+      - name: Test zig build
+        id: test-zigbuild
+        uses: ./
+        with:
+          path: rust_http_proxy
+          use_zigbuild: true
+          args: -p rust_http_proxy
+          debug: true
+      - name: Output
+        id: output2
+        run: |
+          echo "release_dir: ${{ steps.test-zigbuild.outputs.release_dir }}"
+          ls -lh ${{ steps.test-zigbuild.outputs.release_dir }}
       - name: Release Latest Tag
         env:
           GH_TOKEN: ${{ github.token }}

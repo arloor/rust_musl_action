@@ -6,6 +6,9 @@ echo "after_install: $INPUT_AFTER_INSTALL"
 echo "rust_version: $INPUT_RUST_VERSION"
 echo "use_musl: $INPUT_USE_MUSL"
 echo "musl_version: $INPUT_MUSL_VERSION"
+echo "use_zigbuild: $INPUT_USE_ZIGBUILD"
+echo "zig_version: $INPUT_ZIG_VERSION"
+echo "zig_glibc_version: $INPUT_ZIG_GLIBC_VERSION"
 echo "path: $INPUT_PATH"
 echo "args: $INPUT_ARGS"
 echo "debug: $INPUT_DEBUG"
@@ -80,9 +83,25 @@ install_rust() {
     echo -e "\e[32m=============install rust in $((end - start)) seconds ================\e[0m"
 }
 
+install_zig() {
+    start=$(date +%s)
+    version=$INPUT_ZIG_VERSION
+    name=zig-x86_64-linux-${version}
+    echo "Installing zig ${version}..."
+    curl -SsLf https://ziglang.org/download/${version}/${name}.tar.xz -o- | tar -xJf - -C /tmp
+    export PATH="/tmp/${name}:$PATH"
+    zig version
+    echo "Installing cargo-zigbuild..."
+    cargo install cargo-zigbuild
+    end=$(date +%s)
+    echo -e "\e[32m=============install zig and cargo-zigbuild in $((end - start)) seconds ================\e[0m"
+}
+
 build() {
     start=$(date +%s)
-    if [ "true" = "$INPUT_USE_MUSL" ]; then
+    if [ "true" = "$INPUT_USE_ZIGBUILD" ]; then
+        cargo zigbuild --release --target x86_64-unknown-linux-gnu.${INPUT_ZIG_GLIBC_VERSION} "$@"
+    elif [ "true" = "$INPUT_USE_MUSL" ]; then
         cargo build --release --target x86_64-unknown-linux-musl "$@"
     else
         cargo build --release --target x86_64-unknown-linux-gnu "$@"
@@ -96,11 +115,18 @@ build() {
 
 apt_install curl gcc $INPUT_EXTRA_DEPS
 install_rust
-if [ "true" = "$INPUT_USE_MUSL" ]; then
+
+if [ "true" = "$INPUT_USE_ZIGBUILD" ]; then
+    echo "Using cargo zigbuild"
+    install_zig
+elif [ "true" = "$INPUT_USE_MUSL" ]; then
     echo "Using musl"
-    target_part_path="/x86_64-unknown-linux-musl"
     apt_install make
     install_musl
+fi
+
+if [ "true" = "$INPUT_USE_MUSL" ]; then
+    target_part_path="/x86_64-unknown-linux-musl"
 else
     target_part_path="/x86_64-unknown-linux-gnu"
 fi
