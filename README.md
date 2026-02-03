@@ -4,7 +4,8 @@ A GitHub Action for building Rust projects with musl or GNU libc targets on x86_
 
 ## Features
 
-- Build Rust projects with either musl or GNU libc targets
+- Build Rust projects with musl, GNU libc, or cargo-zigbuild targets
+- Support for cargo-zigbuild to target specific glibc versions
 - Support for custom Rust versions
 - Install additional system dependencies
 - Run custom commands after dependency installation
@@ -22,6 +23,26 @@ A GitHub Action for building Rust projects with musl or GNU libc targets on x86_
   with:
     path: my-rust-project
     args: --no-default-features
+```
+
+### Example with cargo-zigbuild (for old glibc compatibility)
+
+```yaml
+- name: Build with cargo-zigbuild
+  id: build
+  uses: arloor/rust_musl_action@latest
+  with:
+    path: my-rust-project
+    use_zigbuild: true
+    zig_version: 0.15.2
+    zig_glibc_version: 2.17 # Target glibc 2.17 for maximum compatibility
+    args: --no-default-features
+
+- name: Upload Artifacts
+  uses: actions/upload-artifact@v3
+  with:
+    name: release-binaries
+    path: ${{ steps.build.outputs.release_dir }}
 ```
 
 ### Advanced Example with musl
@@ -66,26 +87,30 @@ A GitHub Action for building Rust projects with musl or GNU libc targets on x86_
 
 ## Inputs
 
-| Input | Description | Required | Default |
-|-------|-------------|----------|---------|
-| `path` | Relative path under $GITHUB_WORKSPACE to place the repository | Yes | `""` |
-| `args` | Custom arguments passed to `cargo build` | Yes | `""` |
-| `use_musl` | Whether to use musl target (`true` or `false`) | Yes | `false` |
-| `rust_version` | Rust version to install (e.g., `1.76.0`). If empty, uses latest | Yes | `""` |
-| `musl_version` | musl version to compile and install (e.g., `1.2.5`) | Yes | `1.2.5` |
-| `extra_deps` | Extra apt dependencies to install, separated by spaces (e.g., `libssl-dev libpq-dev`) | Yes | `""` |
-| `after_install` | Shell commands to run after installing dependencies | Yes | `""` |
-| `debug` | Enable debug mode for verbose output (`true` or `false`) | Yes | `false` |
-| `apt_mirror` | Custom APT mirror to use (e.g., `mirrors.mit.edu`) | No | `""` |
-| `rust_flags` | Custom RUSTFLAGS (e.g., `"-C target-feature=+crt-static"`) | No | `""` |
+| Input               | Description                                                                            | Required | Default  |
+| ------------------- | -------------------------------------------------------------------------------------- | -------- | -------- |
+| `path`              | Relative path under $GITHUB_WORKSPACE to place the repository                          | Yes      | `""`     |
+| `args`              | Custom arguments passed to `cargo build` or `cargo zigbuild`                           | Yes      | `""`     |
+| `use_musl`          | Whether to use musl target (`true` or `false`). Mutually exclusive with `use_zigbuild` | Yes      | `false`  |
+| `use_zigbuild`      | Whether to use cargo-zigbuild (`true` or `false`). Mutually exclusive with `use_musl`  | Yes      | `false`  |
+| `rust_version`      | Rust version to install (e.g., `1.76.0`). If empty, uses latest                        | Yes      | `""`     |
+| `musl_version`      | musl version to compile and install (e.g., `1.2.5`)                                    | Yes      | `1.2.5`  |
+| `zig_version`       | zig version for cargo-zigbuild (e.g., `0.15.2`)                                        | Yes      | `0.15.2` |
+| `zig_glibc_version` | Target glibc version for cargo-zigbuild (e.g., `2.17`, `2.27`)                         | Yes      | `2.17`   |
+| `extra_deps`        | Extra apt dependencies to install, separated by spaces (e.g., `libssl-dev libpq-dev`)  | Yes      | `""`     |
+| `after_install`     | Shell commands to run after installing dependencies                                    | Yes      | `""`     |
+| `debug`             | Enable debug mode for verbose output (`true` or `false`)                               | Yes      | `false`  |
+| `apt_mirror`        | Custom APT mirror to use (e.g., `mirrors.mit.edu`)                                     | No       | `""`     |
+| `rust_flags`        | Custom RUSTFLAGS (e.g., `"-C target-feature=+crt-static"`)                             | No       | `""`     |
 
 ## Outputs
 
-| Output | Description |
-|--------|-------------|
+| Output        | Description                                                                 |
+| ------------- | --------------------------------------------------------------------------- |
 | `release_dir` | The directory path containing the compiled release binaries (ends with `/`) |
 
 The release directory will be:
+
 - `{path}/target/x86_64-unknown-linux-musl/release/` when using musl
 - `{path}/target/x86_64-unknown-linux-gnu/release/` when using GNU libc
 
@@ -93,6 +118,7 @@ The release directory will be:
 
 - **musl target**: `x86_64-unknown-linux-musl` - produces static binaries
 - **GNU target**: `x86_64-unknown-linux-gnu` - produces dynamic binaries
+- **zigbuild target**: `x86_64-unknown-linux-gnu.{glibc_version}` - produces binaries compatible with specific glibc versions (e.g., `x86_64-unknown-linux-gnu.2.17`)
 
 ## How It Works
 
@@ -101,15 +127,17 @@ This action uses a Docker container based on Ubuntu Focal (20.04) that:
 1. Configures APT mirror (if specified)
 2. Installs required dependencies (`curl`, `gcc`, and any extra dependencies)
 3. Installs Rust toolchain with the specified version
-4. If using musl: compiles and installs musl-gcc from source
-5. Adds the appropriate Rust target (musl or GNU)
-6. Runs any custom `after_install` commands
-7. Builds the Rust project with `cargo build --release`
-8. Outputs the release directory path
+4. If using zigbuild: downloads and installs zig, then installs cargo-zigbuild
+5. If using musl: compiles and installs musl-gcc from source
+6. Adds the appropriate Rust target (musl or GNU)
+7. Runs any custom `after_install` commands
+8. Builds the Rust project with `cargo build --release`, `cargo zigbuild --release`, or musl build
+9. Outputs the release directory path
 
 ## Development and Testing
 
 This action is tested in the [Auto-release workflow](.github/workflows/auto-release.yml), which:
+
 - Builds a real Rust project with complex dependencies
 - Tests both musl and GNU targets
 - Publishes the `latest` release tag with built artifacts
