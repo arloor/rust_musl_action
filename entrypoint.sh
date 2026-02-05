@@ -103,7 +103,12 @@ install_zig() {
 build() {
     start=$(date +%s)
     if [ "true" = "$INPUT_USE_ZIGBUILD" ]; then
-        cargo zigbuild --release --target x86_64-unknown-linux-gnu.${INPUT_ZIG_GLIBC_VERSION} "$@"
+        if [ -n "$INPUT_ZIG_GLIBC_VERSION" ]; then
+            target="x86_64-unknown-linux-gnu.${INPUT_ZIG_GLIBC_VERSION}"
+        else
+            target="x86_64-unknown-linux-gnu"
+        fi
+        cargo zigbuild --release --target ${target} "$@"
     elif [ "true" = "$INPUT_USE_MUSL" ]; then
         cargo build --release --target x86_64-unknown-linux-musl "$@"
     else
