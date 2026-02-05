@@ -96,7 +96,7 @@ A GitHub Action for building Rust projects with musl or GNU libc targets on x86_
 | `rust_version`      | Rust version to install (e.g., `1.76.0`). If empty, uses latest                        | Yes      | `""`     |
 | `musl_version`      | musl version to compile and install (e.g., `1.2.5`)                                    | Yes      | `1.2.5`  |
 | `zig_version`       | zig version for cargo-zigbuild (e.g., `0.15.2`)                                        | Yes      | `0.15.2` |
-| `zig_glibc_version` | Target glibc version for cargo-zigbuild (e.g., `2.17`, `2.27`)                         | Yes      | `2.17`   |
+| `zig_glibc_version` | Target glibc version for cargo-zigbuild (e.g., `2.17`, `2.27`)                         | Yes      | `""`   |
 | `extra_deps`        | Extra apt dependencies to install, separated by spaces (e.g., `libssl-dev libpq-dev`)  | Yes      | `""`     |
 | `after_install`     | Shell commands to run after installing dependencies                                    | Yes      | `""`     |
 | `debug`             | Enable debug mode for verbose output (`true` or `false`)                               | Yes      | `false`  |
