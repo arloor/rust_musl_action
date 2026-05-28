@@ -14,9 +14,9 @@ jobs:
     steps:
       - name: Checkout this action
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Checkout rust_http_proxy
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: arloor/rust_http_proxy
           path: rust_http_proxy
@@ -51,9 +51,9 @@ jobs:
     steps:
       - name: Checkout this action
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Checkout nftables-nat-rust
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: arloor/nftables-nat-rust
           path: nftables-nat-rust
@@ -78,9 +78,9 @@ jobs:
     steps:
       - name: Checkout this action
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Checkout nftables-nat-rust
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: arloor/nftables-nat-rust
           path: nftables-nat-rust
@@ -105,7 +105,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/release'
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Release Latest Tag
         env:
           GH_TOKEN: ${{ github.token }}
