@@ -60,7 +60,7 @@ inputs:
 # Define your outputs here.
 outputs:
   release_dir:
-    description: "the dir which contain the musl release binary, NOTE: the value ends without '/'"
+    description: "The directory containing release binaries, without a trailing '/'"
 
 runs:
   using: docker

@@ -107,12 +107,12 @@ A GitHub Action for building Rust projects with musl or GNU libc targets on x86_
 
 | Output        | Description                                                                 |
 | ------------- | --------------------------------------------------------------------------- |
-| `release_dir` | The directory path containing the compiled release binaries (ends with `/`) |
+| `release_dir` | The directory path containing the compiled release binaries (without a trailing `/`) |
 
 The release directory will be:
 
-- `{path}/target/x86_64-unknown-linux-musl/release/` when using musl
-- `{path}/target/x86_64-unknown-linux-gnu/release/` when using GNU libc
+- `{path}/target/x86_64-unknown-linux-musl/release` when using musl
+- `{path}/target/x86_64-unknown-linux-gnu/release` when using GNU libc
 
 ## Build Targets
 

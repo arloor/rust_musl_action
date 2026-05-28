@@ -1,4 +1,21 @@
-#!/bin/sh -l
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+: "${INPUT_EXTRA_DEPS:=}"
+: "${INPUT_AFTER_INSTALL:=}"
+: "${INPUT_RUST_VERSION:=}"
+: "${INPUT_USE_MUSL:=false}"
+: "${INPUT_MUSL_VERSION:=1.2.5}"
+: "${INPUT_USE_ZIGBUILD:=false}"
+: "${INPUT_ZIG_VERSION:=0.15.2}"
+: "${INPUT_ZIG_GLIBC_VERSION:=}"
+: "${INPUT_PATH:=}"
+: "${INPUT_ARGS:=}"
+: "${INPUT_DEBUG:=false}"
+: "${INPUT_APT_MIRROR:=}"
+: "${RUSTFLAGS:=}"
+
+setup_apt_source_done=0
 
 echo -e "\e[32m=========================================\e[0m"
 echo "extra_deps: $INPUT_EXTRA_DEPS"
@@ -16,10 +33,29 @@ echo "apt_mirror: $INPUT_APT_MIRROR"
 echo "rust_flags: ${RUSTFLAGS}"
 echo -e "\e[32m=========================================\e[0m"
 
+validate_inputs() {
+    if [ "true" = "$INPUT_USE_MUSL" ] && [ "true" = "$INPUT_USE_ZIGBUILD" ]; then
+        echo -e "\e[31muse_musl and use_zigbuild are mutually exclusive; set only one to true.\e[0m" >&2
+        exit 1
+    fi
+}
+
 setup_apt_source() {
     if [ -n "$INPUT_APT_MIRROR" ]; then # 更简洁的非空检查
-        echo "Using mirror: $INPUT_APT_MIRROR"
-        if sed -i "s/archive.ubuntu.com/$INPUT_APT_MIRROR/g" /etc/apt/sources.list; then
+        apt_mirror="${INPUT_APT_MIRROR%/}"
+        case "$apt_mirror" in
+        http://* | https://*) ;;
+        *) apt_mirror="http://${apt_mirror}" ;;
+        esac
+        escaped_apt_mirror="${apt_mirror//&/\\&}"
+
+        echo "Using mirror: $apt_mirror"
+        if sed -i \
+            -e "s|http://archive.ubuntu.com/ubuntu|${escaped_apt_mirror}/ubuntu|g" \
+            -e "s|http://security.ubuntu.com/ubuntu|${escaped_apt_mirror}/ubuntu|g" \
+            -e "s|https://archive.ubuntu.com/ubuntu|${escaped_apt_mirror}/ubuntu|g" \
+            -e "s|https://security.ubuntu.com/ubuntu|${escaped_apt_mirror}/ubuntu|g" \
+            /etc/apt/sources.list; then
             echo "Sources list updated successfully."
             if [ "true" = "$INPUT_DEBUG" ]; then
                 echo -e "\e[32mcurrent /etc/apt/sources.list:\e[0m"
@@ -57,9 +93,9 @@ install_musl() {
     start=$(date +%s)
     cd /var/
     version=$INPUT_MUSL_VERSION
-    curl -SsLf http://musl.libc.org/releases/musl-${version}.tar.gz -o musl-${version}.tar.gz
-    tar -zxf musl-${version}.tar.gz
-    cd musl-${version}
+    curl -SsLf "http://musl.libc.org/releases/musl-${version}.tar.gz" -o "musl-${version}.tar.gz"
+    tar -zxf "musl-${version}.tar.gz"
+    cd "musl-${version}"
     ./configure >/dev/null
     make -j 2 >/dev/null
     make install >/dev/null
@@ -73,10 +109,11 @@ install_musl() {
 
 install_rust() {
     start=$(date +%s)
+    version_part=()
     if [ "" != "$INPUT_RUST_VERSION" ]; then
-        local version_part="--default-toolchain $INPUT_RUST_VERSION"
+        version_part=(--default-toolchain "$INPUT_RUST_VERSION")
     fi
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y $version_part
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-host x86_64-unknown-linux-gnu -y "${version_part[@]}"
     export PATH="$HOME/.cargo/bin:$PATH"
     rustc --version
     end=$(date +%s)
@@ -88,7 +125,7 @@ install_zig() {
     version=$INPUT_ZIG_VERSION
     name=zig-x86_64-linux-${version}
     echo "Installing zig ${version}..."
-    curl -SsLf https://ziglang.org/download/${version}/${name}.tar.xz -o- | tar -xJf - -C /tmp
+    curl -SsLf "https://ziglang.org/download/${version}/${name}.tar.xz" -o- | tar -xJf - -C /tmp
     export PATH="/tmp/${name}:$PATH"
     zig version
     if [ $? -ne 0 ]; then
@@ -108,7 +145,7 @@ build() {
         else
             target="x86_64-unknown-linux-gnu"
         fi
-        cargo zigbuild --release --target ${target} "$@"
+        cargo zigbuild --release --target "$target" "$@"
     elif [ "true" = "$INPUT_USE_MUSL" ]; then
         cargo build --release --target x86_64-unknown-linux-musl "$@"
     else
@@ -120,6 +157,8 @@ build() {
     end=$(date +%s)
     echo -e "\e[32m=============build finished in $((end - start)) seconds ================\e[0m"
 }
+
+validate_inputs
 
 apt_install curl gcc $INPUT_EXTRA_DEPS
 install_rust
@@ -147,8 +186,9 @@ fi
 
 echo -e "\e[32mCompiling Rust crate.....\e[0m"
 # Use INPUT_<INPUT_NAME> to get the value of an input
-echo "cd /github/workspace/$INPUT_PATH"
-cd /github/workspace/$INPUT_PATH
+workspace="${GITHUB_WORKSPACE:-/github/workspace}"
+echo "cd ${workspace}/${INPUT_PATH}"
+cd "${workspace}/${INPUT_PATH}"
 build $INPUT_ARGS
 # Write outputs to the $GITHUB_OUTPUT file
 if [ "" = "$INPUT_PATH" ]; then
