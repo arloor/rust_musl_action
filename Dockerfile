@@ -24,6 +24,7 @@ RUN curl -SsLf https://musl.libc.org/releases/musl-1.2.5.tar.gz | tar -xz -C /tm
     && make -j"$(nproc)" >/dev/null \
     && make install >/dev/null \
     && ln -fs /usr/local/musl/bin/musl-gcc /usr/bin/musl-gcc \
+    && cd / \
     && rm -rf /tmp/musl-1.2.5 \
     && rustup target add x86_64-unknown-linux-musl
 
