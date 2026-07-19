@@ -93,11 +93,11 @@ install_musl() {
     start=$(date +%s)
     cd /var/
     version=$INPUT_MUSL_VERSION
-    curl -SsLf "http://musl.libc.org/releases/musl-${version}.tar.gz" -o "musl-${version}.tar.gz"
+    curl -SsLf "https://musl.libc.org/releases/musl-${version}.tar.gz" -o "musl-${version}.tar.gz"
     tar -zxf "musl-${version}.tar.gz"
     cd "musl-${version}"
     ./configure >/dev/null
-    make -j 2 >/dev/null
+    make -j "$(nproc)" >/dev/null
     make install >/dev/null
     ln -fs /usr/local/musl/bin/musl-gcc /usr/bin/musl-gcc
     musl-gcc --version
@@ -128,9 +128,6 @@ install_zig() {
     curl -SsLf "https://ziglang.org/download/${version}/${name}.tar.xz" -o- | tar -xJf - -C /tmp
     export PATH="/tmp/${name}:$PATH"
     zig version
-    if [ $? -ne 0 ]; then
-        exit 1
-    fi
     echo "Installing cargo-zigbuild..."
     cargo install cargo-zigbuild
     end=$(date +%s)
@@ -150,9 +147,6 @@ build() {
         cargo build --release --target x86_64-unknown-linux-musl "$@"
     else
         cargo build --release --target x86_64-unknown-linux-gnu "$@"
-    fi
-    if [ $? -ne 0 ]; then
-        exit 1
     fi
     end=$(date +%s)
     echo -e "\e[32m=============build finished in $((end - start)) seconds ================\e[0m"

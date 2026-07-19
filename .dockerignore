@@ -1,0 +1,8 @@
+.git
+.github
+.vscode
+.gitattributes
+.gitignore
+CODEOWNERS
+LICENSE
+README.md

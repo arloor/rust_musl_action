@@ -110,9 +110,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if $(gh release delete latest -y --cleanup-tag); 
-            then echo "delete old release"; 
-            else echo "no old release";
+          if gh release delete latest -y --cleanup-tag; then
+            echo "delete old release"
+          else
+            echo "no old release"
           fi
           git config --local user.email "admin@arloor.com"
           git config --local user.name "arloor"

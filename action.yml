@@ -6,35 +6,35 @@ author: "arloor"
 inputs:
   path:
     description: "Relative path under $GITHUB_WORKSPACE to place the repository"
-    required: true
+    required: false
     default: ""
   args:
     description: "custom args passed to cargo build"
-    required: true
+    required: false
     default: ""
   rust_version:
     description: "rust version. eg: 1.76.0. default is latest"
-    required: true
+    required: false
     default: ""
   use_musl:
     description: "use musl or not. eg: true"
-    required: true
+    required: false
     default: "false"
   musl_version:
     description: "musl version. eg: 1.2.5"
-    required: true
+    required: false
     default: "1.2.5"
   extra_deps:
     description: 'extra dependencies to install, separated by space. eg: "libssl-dev libpq-dev"'
-    required: true
+    required: false
     default: ""
   after_install:
     description: "shell commands to run after install dependencies"
-    required: true
+    required: false
     default: ""
   debug:
     description: "debug or not. eg: true"
-    required: true
+    required: false
     default: "false"
   apt_mirror:
     description: "apt mirror. eg: mirrors.mit.edu"
@@ -46,15 +46,15 @@ inputs:
     default: ""
   use_zigbuild:
     description: "use cargo zigbuild or not. eg: true"
-    required: true
+    required: false
     default: "false"
   zig_version:
     description: "zig version. eg: 0.15.2"
-    required: true
+    required: false
     default: "0.15.2"
   zig_glibc_version:
     description: "glibc version for cargo zigbuild. eg: 2.17"
-    required: true
+    required: false
     default: ""
 
 # Define your outputs here.
