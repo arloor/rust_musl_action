@@ -122,26 +122,33 @@ The release directory will be:
 
 ## How It Works
 
-This action uses a Docker container based on Ubuntu Focal (20.04) that:
+This action uses a **pre-built Docker image** (hosted on GHCR) based on Ubuntu Focal (20.04), with the following pre-installed:
 
-1. Configures APT mirror (if specified)
-2. Installs required dependencies (`curl`, `gcc`, and any extra dependencies)
-3. Installs Rust toolchain with the specified version
-4. If using zigbuild: downloads and installs zig, then installs cargo-zigbuild
-5. If using musl: compiles and installs musl-gcc from source
-6. Adds the appropriate Rust target (musl or GNU)
-7. Runs any custom `after_install` commands
-8. Builds the Rust project with `cargo build --release`, `cargo zigbuild --release`, or musl build
-9. Outputs the release directory path
+- Rust stable toolchain
+- musl-gcc 1.2.5
+- zig 0.15.2 + cargo-zigbuild
+- Common build tools (curl, gcc, make, xz-utils)
+
+At runtime, the action:
+
+1. Skips installation of tools already present at the expected version (fast path)
+2. Only installs/compiles when a non-default version is requested
+3. Configures APT mirror (if specified) and installs extra dependencies
+4. Runs any custom `after_install` commands
+5. Builds the Rust project with `cargo build --release`, `cargo zigbuild --release`, or musl build
+6. Outputs the release directory path
+
+The image is automatically rebuilt and pushed to GHCR when the `release` branch is updated (see [build-image.yml](.github/workflows/build-image.yml)).
 
 ## Development and Testing
 
 This action is tested in the [Auto-release workflow](.github/workflows/auto-release.yml), which:
 
-- Builds a real Rust project with complex dependencies
-- Tests both musl and GNU targets
-- Publishes the `latest` release tag with built artifacts
-- Validates the action works end-to-end
+- Builds the Docker image locally and shares it across test jobs via artifacts
+- Tests musl, GNU, and cargo-zigbuild targets against real Rust projects
+- Publishes the `latest` release tag when tests pass on the `release` branch
+
+The [Build Image workflow](.github/workflows/build-image.yml) pushes the image to GHCR on `release` branch pushes or manual dispatch.
 
 ## References
 

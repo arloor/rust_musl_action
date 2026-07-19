@@ -7,96 +7,146 @@ permissions:
   contents: write
 
 jobs:
+  build-image:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Build image
+        run: docker build -t rust-musl-action:test .
+      - name: Save image
+        run: docker save rust-musl-action:test -o /tmp/image.tar
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp/image.tar
+          retention-days: 1
+
   test-normal-glibc:
     name: Test Normal Glibc Build
     runs-on: ubuntu-latest
+    needs: build-image
 
     steps:
       - name: Checkout this action
-        id: checkout
         uses: actions/checkout@v6
       - name: Checkout rust_http_proxy
         uses: actions/checkout@v6
         with:
           repository: arloor/rust_http_proxy
           path: rust_http_proxy
+      - name: Load image
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp
+      - run: docker load -i /tmp/image.tar
 
       - name: Test
         id: test
-        uses: ./
-        with:
-          path: rust_http_proxy
-          use_musl: false
-          extra_deps: cmake zlib1g-dev libelf-dev clang pkg-config make
-          after_install: |
-            apt-get remove -y gcc
-            apt-get install -y gcc-10
-            # find / -name libelf.a
-            # find / -name libbpf.a
-            # find / -name libz.a
-            export LIBBPF_SYS_LIBRARY_PATH=/usr/lib:/usr/lib64:/usr/lib/x86_64-linux-gnu
-            echo -e "\e[31mLIBBPF_SYS_LIBRARY_PATH=$LIBBPF_SYS_LIBRARY_PATH\e[0m"
-          args: -p rust_http_proxy --no-default-features --features aws_lc_rs,bpf_static
-          debug: true
+        run: |
+          mkdir -p /tmp/gh_output
+          docker run --rm \
+            -v "${{ github.workspace }}:/github/workspace" \
+            -v "/tmp/gh_output:/github/output" \
+            -e "GITHUB_WORKSPACE=/github/workspace" \
+            -e "GITHUB_OUTPUT=/github/output/github_output" \
+            -e "INPUT_PATH=rust_http_proxy" \
+            -e "INPUT_USE_MUSL=false" \
+            -e "INPUT_USE_ZIGBUILD=false" \
+            -e "INPUT_EXTRA_DEPS=cmake zlib1g-dev libelf-dev clang pkg-config make" \
+            -e "INPUT_AFTER_INSTALL=apt-get remove -y gcc && apt-get install -y gcc-10 && export LIBBPF_SYS_LIBRARY_PATH=/usr/lib:/usr/lib64:/usr/lib/x86_64-linux-gnu" \
+            -e "INPUT_ARGS=-p rust_http_proxy --no-default-features --features aws_lc_rs,bpf_static" \
+            -e "INPUT_DEBUG=true" \
+            -e "CARGO_TERM_COLOR=always" \
+            rust-musl-action:test
+          echo "release_dir=$(grep -oP 'release_dir=\K.*' /tmp/gh_output/github_output)" >> "$GITHUB_OUTPUT"
       - name: Output
-        id: output
         run: |
           echo "release_dir: ${{ steps.test.outputs.release_dir }}"
-          ls -lh ${{ steps.test.outputs.release_dir }}
+          ls -lh ${{ github.workspace }}/${{ steps.test.outputs.release_dir }}
 
   test-zigbuild:
     name: Test Zig Build
     runs-on: ubuntu-latest
+    needs: build-image
 
     steps:
       - name: Checkout this action
-        id: checkout
         uses: actions/checkout@v6
       - name: Checkout nftables-nat-rust
         uses: actions/checkout@v6
         with:
           repository: arloor/nftables-nat-rust
           path: nftables-nat-rust
+      - name: Load image
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp
+      - run: docker load -i /tmp/image.tar
 
       - name: Test
         id: test
-        uses: ./
-        with:
-          path: nftables-nat-rust
-          use_zigbuild: true
-          debug: true
+        run: |
+          mkdir -p /tmp/gh_output
+          docker run --rm \
+            -v "${{ github.workspace }}:/github/workspace" \
+            -v "/tmp/gh_output:/github/output" \
+            -e "GITHUB_WORKSPACE=/github/workspace" \
+            -e "GITHUB_OUTPUT=/github/output/github_output" \
+            -e "INPUT_PATH=nftables-nat-rust" \
+            -e "INPUT_USE_ZIGBUILD=true" \
+            -e "INPUT_DEBUG=true" \
+            -e "CARGO_TERM_COLOR=always" \
+            rust-musl-action:test
+          echo "release_dir=$(grep -oP 'release_dir=\K.*' /tmp/gh_output/github_output)" >> "$GITHUB_OUTPUT"
       - name: Output
-        id: output
         run: |
           echo "release_dir: ${{ steps.test.outputs.release_dir }}"
-          ls -lh ${{ steps.test.outputs.release_dir }}
+          ls -lh ${{ github.workspace }}/${{ steps.test.outputs.release_dir }}
 
   test-musl:
     name: Test musl Build
     runs-on: ubuntu-latest
+    needs: build-image
 
     steps:
       - name: Checkout this action
-        id: checkout
         uses: actions/checkout@v6
       - name: Checkout nftables-nat-rust
         uses: actions/checkout@v6
         with:
           repository: arloor/nftables-nat-rust
           path: nftables-nat-rust
-
-      - name: test
-        id: test
-        uses: ./
+      - name: Load image
+        uses: actions/download-artifact@v4
         with:
-          path: nftables-nat-rust
-          use_musl: true
-          debug: true
+          name: docker-image
+          path: /tmp
+      - run: docker load -i /tmp/image.tar
+
+      - name: Test
+        id: test
+        run: |
+          mkdir -p /tmp/gh_output
+          docker run --rm \
+            -v "${{ github.workspace }}:/github/workspace" \
+            -v "/tmp/gh_output:/github/output" \
+            -e "GITHUB_WORKSPACE=/github/workspace" \
+            -e "GITHUB_OUTPUT=/github/output/github_output" \
+            -e "INPUT_PATH=nftables-nat-rust" \
+            -e "INPUT_USE_MUSL=true" \
+            -e "INPUT_DEBUG=true" \
+            -e "CARGO_TERM_COLOR=always" \
+            rust-musl-action:test
+          echo "release_dir=$(grep -oP 'release_dir=\K.*' /tmp/gh_output/github_output)" >> "$GITHUB_OUTPUT"
       - name: Output
-        id: output
         run: |
           echo "release_dir: ${{ steps.test.outputs.release_dir }}"
-          ls -lh ${{ steps.test.outputs.release_dir }}
+          ls -lh ${{ github.workspace }}/${{ steps.test.outputs.release_dir }}
 
   release-latest-tag:
     name: Release Latest Tag

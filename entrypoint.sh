@@ -41,7 +41,7 @@ validate_inputs() {
 }
 
 setup_apt_source() {
-    if [ -n "$INPUT_APT_MIRROR" ]; then # 更简洁的非空检查
+    if [ -n "$INPUT_APT_MIRROR" ]; then
         apt_mirror="${INPUT_APT_MIRROR%/}"
         case "$apt_mirror" in
         http://* | https://*) ;;
@@ -64,7 +64,7 @@ setup_apt_source() {
             fi
         else
             echo -e "\e[31mFailed to update sources list.\e[0m"
-            exit 1 # 添加错误退出状态
+            exit 1
         fi
     fi
 }
@@ -90,6 +90,17 @@ apt_install() {
 }
 
 install_musl() {
+    # 镜像已预装默认版本，版本匹配则跳过
+    if command -v musl-gcc >/dev/null 2>&1; then
+        installed_version=$(musl-gcc --version 2>/dev/null | head -1 | grep -oP '[\d.]+' | head -1 || true)
+        if [ "$installed_version" = "$INPUT_MUSL_VERSION" ]; then
+            echo -e "\e[32mmusl-gcc $INPUT_MUSL_VERSION already installed, skipping.\e[0m"
+            rustup target add x86_64-unknown-linux-musl 2>/dev/null || true
+            return 0
+        fi
+        echo "musl version mismatch (installed: $installed_version, requested: $INPUT_MUSL_VERSION), reinstalling..."
+    fi
+
     start=$(date +%s)
     cd /var/
     version=$INPUT_MUSL_VERSION
@@ -101,13 +112,26 @@ install_musl() {
     make install >/dev/null
     ln -fs /usr/local/musl/bin/musl-gcc /usr/bin/musl-gcc
     musl-gcc --version
-    # Install musl target
     rustup target add x86_64-unknown-linux-musl
     end=$(date +%s)
     echo -e "\e[32m=============compile musl-gcc in $((end - start)) seconds ================\e[0m"
 }
 
 install_rust() {
+    # 镜像已预装 stable，未指定版本或版本匹配则跳过
+    if command -v rustc >/dev/null 2>&1; then
+        if [ "" = "$INPUT_RUST_VERSION" ]; then
+            echo -e "\e[32mRust $(rustc --version) already installed, skipping.\e[0m"
+            return 0
+        fi
+        installed_version=$(rustc --version | grep -oP '[\d.]+' | head -1 || true)
+        if [ "$installed_version" = "$INPUT_RUST_VERSION" ]; then
+            echo -e "\e[32mRust $INPUT_RUST_VERSION already installed, skipping.\e[0m"
+            return 0
+        fi
+        echo "Rust version mismatch (installed: $installed_version, requested: $INPUT_RUST_VERSION), reinstalling..."
+    fi
+
     start=$(date +%s)
     version_part=()
     if [ "" != "$INPUT_RUST_VERSION" ]; then
@@ -121,6 +145,22 @@ install_rust() {
 }
 
 install_zig() {
+    # 镜像已预装默认版本，版本匹配则跳过
+    if command -v zig >/dev/null 2>&1; then
+        installed_version=$(zig version 2>/dev/null || true)
+        if [ "$installed_version" = "$INPUT_ZIG_VERSION" ]; then
+            echo -e "\e[32mzig $INPUT_ZIG_VERSION already installed, skipping.\e[0m"
+            if command -v cargo-zigbuild >/dev/null 2>&1; then
+                echo -e "\e[32mcargo-zigbuild already installed, skipping.\e[0m"
+                return 0
+            fi
+            echo "Installing cargo-zigbuild..."
+            cargo install cargo-zigbuild
+            return 0
+        fi
+        echo "zig version mismatch (installed: $installed_version, requested: $INPUT_ZIG_VERSION), reinstalling..."
+    fi
+
     start=$(date +%s)
     version=$INPUT_ZIG_VERSION
     name=zig-x86_64-linux-${version}
@@ -154,16 +194,18 @@ build() {
 
 validate_inputs
 
-apt_install curl gcc $INPUT_EXTRA_DEPS
+# curl/gcc/make/xz-utils 已预装在镜像中，仅在需要额外依赖时调用 apt
+if [ -n "$INPUT_EXTRA_DEPS" ]; then
+    apt_install $INPUT_EXTRA_DEPS
+fi
+
 install_rust
 
 if [ "true" = "$INPUT_USE_ZIGBUILD" ]; then
     echo "Using cargo zigbuild"
-    apt_install xz-utils
     install_zig
 elif [ "true" = "$INPUT_USE_MUSL" ]; then
     echo "Using musl"
-    apt_install make
     install_musl
 fi
 
@@ -179,12 +221,10 @@ if [ "" != "$INPUT_AFTER_INSTALL" ]; then
 fi
 
 echo -e "\e[32mCompiling Rust crate.....\e[0m"
-# Use INPUT_<INPUT_NAME> to get the value of an input
 workspace="${GITHUB_WORKSPACE:-/github/workspace}"
 echo "cd ${workspace}/${INPUT_PATH}"
 cd "${workspace}/${INPUT_PATH}"
 build $INPUT_ARGS
-# Write outputs to the $GITHUB_OUTPUT file
 if [ "" = "$INPUT_PATH" ]; then
     echo "release_dir=./target${target_part_path}/release" >>"$GITHUB_OUTPUT"
 else

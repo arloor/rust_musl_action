@@ -64,7 +64,7 @@ outputs:
 
 runs:
   using: docker
-  image: Dockerfile
+  image: docker://ghcr.io/arloor/rust-musl-action:latest
   env:
     CARGO_TERM_COLOR: always
     RUSTFLAGS: ${{ inputs.rust_flags }}
