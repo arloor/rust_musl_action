@@ -92,7 +92,7 @@ apt_install() {
 install_musl() {
     # 镜像已预装默认版本，版本匹配则跳过
     if command -v musl-gcc >/dev/null 2>&1; then
-        installed_version=$(musl-gcc --version 2>/dev/null | head -1 | grep -oP '[\d.]+' | head -1 || true)
+        installed_version=$(cat /usr/local/musl/.musl-version 2>/dev/null || true)
         if [ "$installed_version" = "$INPUT_MUSL_VERSION" ]; then
             echo -e "\e[32mmusl-gcc $INPUT_MUSL_VERSION already installed, skipping.\e[0m"
             rustup target add x86_64-unknown-linux-musl 2>/dev/null || true
@@ -111,6 +111,7 @@ install_musl() {
     make -j "$(nproc)" >/dev/null
     make install >/dev/null
     ln -fs /usr/local/musl/bin/musl-gcc /usr/bin/musl-gcc
+    echo "$version" > /usr/local/musl/.musl-version
     musl-gcc --version
     rustup target add x86_64-unknown-linux-musl
     end=$(date +%s)
