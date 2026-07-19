@@ -120,7 +120,7 @@ install_musl() {
 
 install_rust() {
     # 镜像已预装 stable，未指定版本或版本匹配则跳过
-    if command -v rustc >/dev/null 2>&1; then
+    if rustc --version >/dev/null 2>&1; then
         if [ "" = "$INPUT_RUST_VERSION" ]; then
             echo -e "\e[32mRust $(rustc --version) already installed, skipping.\e[0m"
             return 0

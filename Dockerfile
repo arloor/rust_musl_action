@@ -18,7 +18,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # 预装 Rust stable
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
-    | sh -s -- --default-host x86_64-unknown-linux-gnu -y
+    | sh -s -- --default-host x86_64-unknown-linux-gnu -y \
+    && . "$HOME/.cargo/env" \
+    && rustup default stable \
+    && rustc --version
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 # 预编译 musl（默认版本）
