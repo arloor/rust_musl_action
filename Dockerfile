@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
     gcc \
+    libc6-dev \
     make \
     xz-utils \
     && rm -rf /var/lib/apt/lists/*
