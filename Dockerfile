@@ -24,6 +24,12 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
     && rustc --version
 ENV PATH="/root/.cargo/bin:${PATH}"
 
+# 预装 zig + cargo-zigbuild
+RUN curl -SsLf "https://ziglang.org/download/${ZIG_VERSION}/zig-x86_64-linux-${ZIG_VERSION}.tar.xz" \
+    | tar -xJf - -C /opt \
+    && ln -s "/opt/zig-x86_64-linux-${ZIG_VERSION}/zig" /usr/local/bin/zig \
+    && cargo install cargo-zigbuild
+
 # 预编译 musl（默认版本）
 RUN curl -SsLf "https://musl.libc.org/releases/musl-${MUSL_VERSION}.tar.gz" | tar -xz -C /tmp \
     && cd "/tmp/musl-${MUSL_VERSION}" \
@@ -35,12 +41,6 @@ RUN curl -SsLf "https://musl.libc.org/releases/musl-${MUSL_VERSION}.tar.gz" | ta
     && cd / \
     && rm -rf "/tmp/musl-${MUSL_VERSION}" \
     && rustup target add x86_64-unknown-linux-musl
-
-# 预装 zig + cargo-zigbuild
-RUN curl -SsLf "https://ziglang.org/download/${ZIG_VERSION}/zig-x86_64-linux-${ZIG_VERSION}.tar.xz" \
-    | tar -xJf - -C /opt \
-    && ln -s "/opt/zig-x86_64-linux-${ZIG_VERSION}/zig" /usr/local/bin/zig \
-    && cargo install cargo-zigbuild
 
 COPY entrypoint.sh /
 ENTRYPOINT ["bash", "/entrypoint.sh"]
